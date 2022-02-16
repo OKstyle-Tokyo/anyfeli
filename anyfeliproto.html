@@ -37,7 +37,7 @@
         try {
           console.log("Requesting Bluetooth Device...");
           const device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: [UUID_S]}],
+            filters: [{ namePrefix: "Blank" }],
             optionalServices: [UUID_S],
           });
           
