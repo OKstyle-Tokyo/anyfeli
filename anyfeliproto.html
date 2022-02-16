@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!---->
+    <link rel="stylesheet" href="main.css">
+    
+    <title>AnyFeliProto</title>
+  </head>
+
+  <body>
+    <h1>AnyFeliProto</h1>
+    <br />
+    <button onclick="onStartButtonClick()">接続</button>
+    <br />
+    <button onclick="onResetButtonClick()">リセット</button>
+    <br />
+
+    <h3>Live Output</h3>
+    <div id="output" class="output">
+    <div id="content"></div>
+    <div id="status"></div>
+    <pre id="log"></pre>
+    </div>
+    <div id="device_name">xxxx</div>
+    <div id="data_text">xxxx</div>
+
+    <script>
+      const UUID_S = "BFC48E47-D301-45E7-9438-778662410516"; // Service
+      const UUID_C = "3D99C3FC-9CE1-442F-8EDD-6A5EAD8F4B1D"; // Characteristic
+
+      let bluetoothDevice;
+      let characteristic;
+
+      async function onStartButtonClick() {
+        try {
+          console.log("Requesting Bluetooth Device...");
+          const device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [UUID_S]}],
+            optionalServices: [UUID_S],
+          });
+          
+          console.log("Connecting to GATT Server...");
+          const server = await device.gatt.connect();
+          console.log("Getting Service...");
+          const service = await server.getPrimaryService(UUID_S);
+          console.log("Getting Characteristic...");
+          characteristic = await service.getCharacteristic(UUID_C);
+          console.log("characteristic OK!!")
+          alert("BLE接続が完了しました。");
+          
+        } catch (error) {
+          console.log("Argh! " + error);
+        }
+      }
+      
+    //BLE切断処理
+    function onResetButtonClick() {
+      if (!bluetoothDevice || !bluetoothDevice.gatt.connected) return ;
+      bluetoothDevice.gatt.disconnect();
+      alert("BLE接続を切断しました。")
+    }
+    </script>
+  </body>
+</html>
