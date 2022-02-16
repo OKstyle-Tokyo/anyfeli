@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!---->
+    <link rel="stylesheet" href="main.css">
+    
+    <title>SAKETAMU</title>
+  </head>
+
+  <body>
+    <h1>SakeTamu</h1>
+    <br />
+    <button onclick="onStartButtonClick()">接続</button>
+    <br />
+    <button onclick="onResetButtonClick()">リセット</button>
+    <br />
+    <!--
+    <script>
+      var ChromeSamples = {
+        log: function() {
+          var line = Array.prototype.slice.call(arguments).map(function(argument) {
+            return typeof argument === 'string' ? argument : JSON.stringify(argument);
+          }).join(' ');
+          document.querySelector('#log').textContent += line + '\n';
+         },
+         clearLog: function() {
+           document.querySelector('#log').textContent = '';
+         },
+         setStatus: function(status) {
+           document.querySelector('#status').textContent = status;
+         },
+         setContent: function(newContent) {
+           var content = document.querySelector('#content');
+           while(content.hasChildNodes()) {
+             content.removeChild(content.lastChild);
+          }
+            content.appendChild(newContent);
+          }
+        };
+      </script>
+      -->
+    <h3>Live Output</h3>
+    <div id="output" class="output">
+    <div id="content"></div>
+    <div id="status"></div>
+    <pre id="log"></pre>
+    </div>
+    <div id="device_name">xxxx</div>
+    <div id="data_text">xxxx</div>
+
+    <script> //参考：https://qiita.com/youtoy/items/3da58570972803134f6c
+      const UUID_1 = "a6ad91bd-376e-465f-8c6c-460fd3e15038"; // Service
+      const UUID_2 = "80d881a6-1ab3-47f0-8c75-2c31eac31f43"; // Characteristic
+      const UUID_3 = "c3266f2b-8e00-485e-a75b-6a0685f9c74b"; // Descriptor
+
+      let bluetoothDevice;
+      let characteristic;
+
+      async function onStartButtonClick() {
+        try {
+          console.log("Requesting Bluetooth Device...");
+          const device = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: "SAKETAMU" }],
+            optionalServices: [UUID_1],
+          });
+          
+          console.log("Connecting to GATT Server...");
+          const server = await device.gatt.connect();
+          console.log("Getting Service...");
+          const service = await server.getPrimaryService(UUID_1);
+          console.log("Getting Characteristic...");
+          characteristic = await service.getCharacteristic(UUID_2);
+          console.log("characteristic OK!!")
+          alert("BLE接続が完了しました。");
+          
+        } catch (error) {
+          console.log("Argh! " + error);
+        }
+      }
+      
+    //BLE切断処理
+    function onResetButtonClick() {
+      if (!bluetoothDevice || !bluetoothDevice.gatt.connected) return ;
+      bluetoothDevice.gatt.disconnect();
+      alert("BLE接続を切断しました。")
+    }
+    </script>
+  </body>
+</html>
